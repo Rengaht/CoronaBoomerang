@@ -1,0 +1,3 @@
+enum Mode{
+   SLEEP,COUNT,RECORD,PROCESS 
+};

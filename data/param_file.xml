@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PARAM>
+  <OUTPUT_FOLDER>C:\Users\reng.tsai\Documents\_P_Corona2017\output\</OUTPUT_FOLDER>
+  <ORDER_FOLDER>C:\Users\reng.tsai\Documents\_P_Corona2017\order\</ORDER_FOLDER>
+  <VIDEO_FILE>coronaloop_</VIDEO_FILE>
+  <FFMPEG_PATH>C:\ffmpeg\bin\ffmpeg.exe</FFMPEG_PATH>
+  <SERVER_URL>http://mmlab.bremennetwork.tw/Corona2017/</SERVER_URL>
+  <REMOTE_IP></REMOTE_IP>
+  <REMOTE_PORT></REMOTE_PORT>
+  <CAPTURE_FRAME>10</CAPTURE_FRAME>
+  <CAPTURE_FPS>14</CAPTURE_FPS>
+  <OUTPUT_LOOP>2</OUTPUT_LOOP>
+  <OUTPUT_FPS>20</OUTPUT_FPS>
+  <VIDEO_QUALITY>10</VIDEO_QUALITY>
+</PARAM>
