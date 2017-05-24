@@ -6,6 +6,7 @@ import http.requests.*;
 
 import processing.video.*;
 
+
 Parameter _param;
 Capture _camera;
 
@@ -22,21 +23,27 @@ OscP5 _oscP5;
 NetAddress _osc_remote;
 
 
+
 boolean _use_sony=true;
 SonyCamera _camera_sony;
+
+int _scene_index=0;
 
 
 void setup(){
   size(1280,720);
+  frameRate(30);
   _param=new Parameter();
   
   _mode=Mode.SLEEP;
   _timer_record=new Timer(1000/_param.CaptureFps,_param.CaptureFrame);
     
+  
   setupCamera();
   setupNetwork();
   setupSerial();
   
+  //sendScene(0);
   
 }
 void update(){
@@ -113,6 +120,8 @@ void draw(){
       showMode("PROCESS");
       break;
   }
+  
+  
 }
 void showMode(String _str){
    pushStyle();
@@ -130,15 +139,20 @@ void keyPressed(){
     case '1':
     case '2':
     case '3':
-      if(_mode==Mode.SLEEP) sendScene(key-'0');
+      if(_mode==Mode.SLEEP) sendScene(key-'1');
       break;
     case 'a':
       changeMode(Mode.SLEEP);
       break;
     case 'c':
       composeVideo(_video_id);
+      break;      
+    case 'u':
+      uploadVideo(_video_id);
       break;
-      
+    case 'p':
+      prepareVideo(_video_id);
+      break;
     case 'R':
       _camera_sony.startRecord();
       break;
@@ -158,6 +172,7 @@ void changeMode(Mode mode){
    
    switch(mode){
     case SLEEP:     
+      //sendScene((_scene_index+1)%3);
       break;
     case COUNT:
       _video_id=createVideoId();
@@ -165,14 +180,39 @@ void changeMode(Mode mode){
       sendCount();
       break;
     case RECORD:
-      _timer_record.restart();
-      _video_frame.clear();
+      switch(_scene_index){
+        case 0:
+          _timer_record.restart();
+          _video_frame.clear();
       
-      if(_use_sony) _camera_sony.startRecord();
+          if(_use_sony) _camera_sony.startRecord();
+          
+          delay(50);
+          
+          sendStart();
       
-      sendStart();
+          break;
+        case 2:
+            sendStart();
+            delay(_param.TacoDelay);
+            _timer_record.restart();
+            _video_frame.clear();
+            
+            if(_use_sony) _camera_sony.startRecord();
+            break;
+        case 1:
+            sendStart();
+        
+            _timer_record.restart();
+            _video_frame.clear();
+            
+            if(_use_sony) _camera_sony.startRecord();
+            break;
+      }
+      
       break;
     case PROCESS:      
+      prepareVideo(_video_id);
       composeVideo(_video_id);
       uploadVideo(_video_id);
       break;

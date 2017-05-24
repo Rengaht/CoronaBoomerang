@@ -100,10 +100,10 @@ class SonyCamera{
     
     return ssdpMessage.substring(start, end).trim();
   }
-  String sendRequest(String method,JSONArray param){
+  JSONObject sendRequest(String method,JSONArray param){
     return sendRequest("camera",method,param,"1.0");
   }  
-  String sendRequest(String dest,String method,JSONArray param,String version){
+  JSONObject sendRequest(String dest,String method,JSONArray param,String version){
     println("Send Request: "+method+" ...");
     
     JSONObject jmethod=new JSONObject();
@@ -116,26 +116,18 @@ class SonyCamera{
     
     jmethod.setInt("id",1);
     jmethod.setString("version",version);
-    //println(jmethod);
-    
-//    PostRequest request=new PostRequest(_service_url+"/"+dest);
-//    request.addData("method",method);
-//    request.addData("params",param.toString());
-//    request.addData("id",str(1));
-//    request.addData("version",version);        
-//    request.send();
-//    println("result: \n"+request.getContent());
-//    return request.getContent();
-     
+
     HttpClient client=new HttpClient();
     try{
       String result=client.fetchTextByPost(_service_url+"/"+dest,jmethod.toString());
-      println("result: \n"+result);
-      return result;
+      //println("result: \n"+result);
+      
+      JSONObject res_=parseJSONObject(result);
+      return res_;
       
     }catch(Exception e){
        e.printStackTrace(); 
-       return "";
+       return new JSONObject();
     }
   }
   
@@ -154,15 +146,22 @@ class SonyCamera{
   }
   void stopRecord(){
      sendRequest("stopMovieRec",null);    
+     
+     // wait for movie
+     delay(2000);
+     
   }
   void loadLatestVideo(){
     
-   
-    JSONArray sval=new JSONArray();
-    sval.append("Contents Transfer");    
-    sendRequest("setCameraFunction",sval);    
-
     
+    
+    boolean success=changeCameraFunction("Contents Transfer");    
+    if(!success){
+      println("FAIL TO CHANGE CAMERA FUNCTION !!!!!");
+      return;
+    }
+   
+   
     JSONObject fparam=new JSONObject();
     fparam.setString("uri","storage:memoryCard1");
     fparam.setInt("stIdx",0);
@@ -172,13 +171,13 @@ class SonyCamera{
     JSONArray fval=new JSONArray();
     fval.append(fparam);
     
-    String info_str_=sendRequest("avContent","getContentList",fval,"1.3");
+    JSONObject info_=sendRequest("avContent","getContentList",fval,"1.3");
     
     //get file
     String url_=null;
     try{
-      JSONObject info_=parseJSONObject(info_str_).getJSONArray("result").getJSONArray(0).getJSONObject(0);
-      url_=info_.getJSONObject("content").getJSONArray("original").getJSONObject(0).getString("url");
+      JSONObject res_=info_.getJSONArray("result").getJSONArray(0).getJSONObject(0);
+      url_=res_.getJSONObject("content").getJSONArray("original").getJSONObject(0).getString("url");
       
       println("File url= "+url_);
     }catch(Exception e){
@@ -195,6 +194,27 @@ class SonyCamera{
     }catch(Exception e){
        e.printStackTrace(); 
     }
-
+    
+     /* back to remote shooting */
+     changeCameraFunction("Remote Shooting");    
+     
   }
+  
+  boolean changeCameraFunction(String func_){
+    
+     JSONArray sval=new JSONArray();
+     sval.append(func_);    
+     JSONObject res=sendRequest("setCameraFunction",sval);
+     
+     int try_count=0;
+     
+     while(!res.isNull("error") && res.getJSONArray("error").getInt(0)!=0){
+       if(try_count>5) return false;
+       delay(500);
+       res=sendRequest("setCameraFunction",sval);
+       try_count++;       
+     }
+     return true;     
+  }
+  
 }

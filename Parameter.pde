@@ -23,6 +23,9 @@ class Parameter{
   String RemoteIp;
   String RemotePort;
   
+  int TacoDelay;
+  String OverlayImage;
+  
   
   Parameter(){
      readParam();
@@ -72,6 +75,12 @@ class Parameter{
     RemotePort=param_xml.getChildren("REMOTE_PORT")[0].getContent();
     println("__RemotePort= "+RemotePort);
     
+    TacoDelay=parseInt(param_xml.getChildren("TACO_DELAY")[0].getContent());
+    println("__TacoDelay= "+TacoDelay);
+    
+    OverlayImage=param_xml.getChildren("OVERLAY_IMAGE")[0].getContent();
+    println("__OverlayImage= "+OverlayImage);
+    
   }
   
   void writeParam(){
@@ -84,7 +93,9 @@ class Parameter{
             
     XML of=xml.addChild("ORDER_FOLDER");
     of.setContent(OrderFolder);    
-
+    
+    XML oi=xml.addChild("OVERLAY_IMAGE");
+    oi.setContent(OverlayImage);
     
     XML vf=xml.addChild("VIDEO_FILE");
     vf.setContent(VideoFile);
@@ -115,6 +126,12 @@ class Parameter{
       
     XML vq=xml.addChild("VIDEO_QUALITY");
     vq.setContent(str(VideoQuality));
+    
+    XML td=xml.addChild("TACO_DELAY");
+    td.setContent(str(TacoDelay));
+    
+    XML om=xml.addChild("OVERLAY_IMAGE");
+    om.setContent(OverlayImage);
     
     
     

@@ -7,8 +7,11 @@ void setupCamera(){
       println("There are no cameras available for capture.");
       return;
     }
-  
-      _camera=new Capture(this,width,height);
+//      println("Available cameras:");
+//    for (int i = 0; i < cameras.length; i++) {
+//      println(cameras[i]);
+//    }
+      _camera=new Capture(this,width,height,30);
       _camera.start();     
   }else{
     _camera_sony=new SonyCamera();
